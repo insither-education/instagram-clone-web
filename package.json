@@ -1,6 +1,6 @@
 {
-  "name": "new-frontend",
-  "version": "0.0.0",
+  "name": "insta-front-web",
+  "version": "1.0.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
