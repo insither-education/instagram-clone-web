@@ -2,8 +2,7 @@ name: ci
 
 on:
   release:
-    types:
-      - published
+    types: [published]
 
   push:
     tags:
@@ -33,7 +32,7 @@ jobs:
     needs: check-application
     runs-on: ubuntu-latest
 
-    if: ${{ github.event_name == 'release' }}
+    if: GitHub.event_name == 'release'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
