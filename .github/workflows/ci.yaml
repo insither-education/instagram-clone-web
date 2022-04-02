@@ -1,16 +1,13 @@
 name: ci
 
 on:
-  release:
-    types: [published]
-
   push:
-    tags:
-      - "*"
+    branches:
+      - "main"
 
   pull_request:
     branches:
-      - "develop"
+      - "main"
 
   workflow_dispatch:
 
@@ -32,8 +29,18 @@ jobs:
     needs: check-application
     runs-on: ubuntu-latest
 
-    if: GitHub.event_name == 'release'
+    if: GitHub.event_name == 'push'
     steps:
+      - name: Prepare
+        id: prep
+        run: |
+          VERSION=${GITHUB_SHA::8}
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF/refs\/tags\//}
+          fi
+          echo ::set-output name=BUILD_DATE::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo ::set-output name=VERSION::${VERSION}
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -44,16 +51,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: haungi/insta-clone-web
-          flavor: |
-            latest=false
-          tags: |
-            type=ref,event=tag
-            type=semver,pattern={{version}}
+      # - name: Docker meta
+      #   id: meta
+      #   uses: docker/metadata-action@v3
+      #   with:
+      #     images: haungi/insta-clone-web
+      #     flavor: |
+      #       latest=false
+      #     tags: |
+      #       type=ref,event=tag
+      #       type=semver,pattern={{version}}
 
       - name: Build and push
         id: docker_build_push
@@ -61,5 +68,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: haungi/insta-clone-web:${{ steps.prep.outputs.VERSION }}
+          # labels: ${{ steps.meta.outputs.labels }}
