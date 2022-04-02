@@ -1,5 +1,5 @@
 {
-  "name": "insta-front-web",
+  "name": "@insighter-academy/insta-front-web",
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
